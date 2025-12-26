@@ -1,0 +1,207 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title> Text to Speech</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+*{
+    box-sizing: border-box;
+}
+
+body{
+    margin:0;
+    height:100vh;
+    font-family:'Poppins',sans-serif;
+    background: radial-gradient(circle at top, #2b1055, #000000);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+}
+
+/* glowing background orbs */
+body::before, body::after{
+    content:'';
+    position:absolute;
+    width:350px;
+    height:350px;
+    border-radius:50%;
+    filter:blur(120px);
+    opacity:0.6;
+}
+body::before{
+    background:#7f5cff;
+    top:-100px;
+    left:-100px;
+}
+body::after{
+    background:#ff4ecd;
+    bottom:-120px;
+    right:-120px;
+}
+
+.card{
+    position:relative;
+    width:640px;
+    padding:45px;
+    border-radius:26px;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter: blur(18px);
+    border:1px solid rgba(255,255,255,0.18);
+    box-shadow:0 0 80px rgba(140,100,255,0.45);
+    text-align:center;
+    animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-10px); }
+}
+
+.title{
+    font-size:36px;
+    font-weight:600;
+    color:#ffffff;
+    letter-spacing:1px;
+}
+
+.subtitle{
+    font-size:14px;
+    color:#c7c7ff;
+    margin-bottom:20px;
+}
+
+textarea{
+    width:100%;
+    height:110px;
+    padding:14px;
+    border-radius:14px;
+    border:none;
+    outline:none;
+    resize:none;
+    background:#0f0f24;
+    color:#ffffff;
+    font-size:14px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.6);
+}
+
+textarea::placeholder{
+    color:#8a8acb;
+}
+
+select{
+    width:100%;
+    margin-top:15px;
+    padding:12px;
+    border-radius:14px;
+    border:none;
+    outline:none;
+    background:#0f0f24;
+    color:#ffffff;
+    font-size:14px;
+}
+
+button{
+    width:100%;
+    margin-top:22px;
+    padding:15px;
+    border:none;
+    border-radius:16px;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    color:#ffffff;
+    background: linear-gradient(135deg, #ff4ecd, #7f5cff);
+    box-shadow:0 0 25px rgba(255,78,205,0.7);
+    transition: all 0.3s ease;
+}
+
+button:hover{
+    transform:scale(1.05);
+    box-shadow:0 0 40px rgba(127,92,255,0.9);
+}
+
+audio{
+    width:100%;
+    margin-top:22px;
+    filter:invert(1) hue-rotate(180deg);
+}
+
+.footer{
+    margin-top:18px;
+    font-size:12px;
+    color:#b9b9ff;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <div class="title">🎙 text to speech</div>
+    <div class="subtitle">AI Powered Multilingual Voice Generator</div>
+
+    <textarea id="text" placeholder="Type text to hear magic..."></textarea>
+
+    <select id="language">
+        {% for lang, code in languages.items() %}
+        <option value="{{ code }}">{{ lang }}</option>
+        {% endfor %}
+    </select>
+
+    <button onclick="generateSpeech()">Generate Voice</button>
+
+    <audio id="audio" controls></audio>
+
+    <div class="footer">
+        AI powered text to speech
+    </div>
+</div>
+
+<script>
+function generateSpeech(){
+    const text = document.getElementById("text").value;
+    const lang = document.getElementById("language").value;
+
+    if(!text.trim()){
+        alert("Please enter some text");
+        return;
+    }
+
+    fetch("/speak",{
+        method:"POST",
+        headers:{"Content-Type":"application/x-www-form-urlencoded"},
+        body:`text=${encodeURIComponent(text)}&output_language=${lang}`
+    })
+    .then(res=>res.json())
+    .then(data=>{
+        if(data.audio){
+            const audio=document.getElementById("audio");
+            audio.src="data:audio/mp3;base64,"+data.audio;
+            audio.play();
+        }
+    });
+}
+</script>
+
+</body>
+</html>
+
+            
+           
+    
+       
+
+
+        
+           
+       
+    
+        
+        
+           
+            
+           
